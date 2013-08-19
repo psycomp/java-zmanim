@@ -8,6 +8,7 @@ import javax.swing.*;
 public class Demo {
 
 	static SimpleDateFormat formatter = new SimpleDateFormat("EEEE MMMM d, h:mm:ss a");
+	static JewishDateFormat jdf = new JewishDateFormat();
 
 	public static void main(String[] args) {
 
@@ -80,7 +81,7 @@ public class Demo {
 			JewishDate jd = new JewishDate();
 			DafYomi dy = new DafYomi();
 
-			label1.setText(jd.format("%h, %g %e, %b"));
+			label1.setText(jdf.format(jd, "%h, %g %e, %b"));
 			label3.setText(formatter.format(d));
 			dyLabel.setText(dy.getDaf(jd, DafYomi.HEBREW));
 

@@ -2,23 +2,13 @@ import java.util.*;
 import net.sourceforge.zmanim.*;
 import net.sourceforge.zmanim.util.*;
 import java.util.TimeZone;
+import java.util.Arrays;
 
 public class JewishDate {
 
-	private static int HebrewEpoch = -1373429;
-
-	private static int[] monthLengths = {0,31,28,31,30,31,30,31,31,30,31,30,31};
-	private static String[] englishMonthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November","December"};
-	private static String[] englishChodeshNames = {"Nissan", "Iyar", "Sivan", "Tamuz", "Av", "Elul", "Tishrei", "MarCheshvan", "Kislev", "Teves", "Sh'vat","Adar", "Adar II"};
-
-	private static String[] englishWeekdayNames = {null, "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Shabbos"};
-
-	private static String[] hebrewChodeshNames = {"\u05E0\u05D9\u05E1\u05DF", "\u05D0\u05D9\u05D9\u05E8", "\u05E1\u05D9\u05D5\u05DF", "\u05EA\u05BC\u05DE\u05D5\u05D6", "\u05D0\u05D1", "\u05D0\u05DC\u05D5\u05BC\u05DC", "\u05EA\u05BC\u05B4\u05E9\u05C1\u05E8\u05D9", "\u05D7\u05E9\u05C1\u05D5\u05DF", "\u05DB\u05BC\u05E1\u05DC\u05D5", "\u05D8\u05D1\u05D8", "\u05E9\u05C1\u05D1\u05D8", "\u05D0\u05D3\u05E8", "\u05D0\u05D3\u05E8 \u05D1\u05F3"};
-	private static String[] hebrewWeekdayNames = {null, "\u05D9\u05D5\u05B9\u05DD \u05E8\u05D0\u05E9\u05D5\u05B9\u05DF", "\u05D9\u05D5\u05B9\u05DD \u05E9\u05C1\u05E0\u05D9", "\u05D9\u05D5\u05B9\u05DD \u05E9\u05C1\u05DC\u05D9\u05E9\u05C1\u05D9", "\u05D9\u05D5\u05B9\u05DD \u05E8\u05D1\u05D9\u05E2\u05D9", "\u05D9\u05D5\u05B9\u05DD \u05D7\u05DE\u05D9\u05E9\u05C1\u05D9", "\u05D9\u05D5\u05B9\u05DD \u05E9\u05C1\u05E9\u05C1\u05D9", "\u05E9\u05D1\u05EA"};
-
-	private int month;
-	private int day;
-	private int year;
+	public int month;
+	public int day;
+	public int year;
 
 	public int englishMonth;
 	public int englishDay;
@@ -31,47 +21,30 @@ public class JewishDate {
 	public static void main(String[] args) {
 		JewishDate jd = new JewishDate();
 		System.out.println(jd);
-		System.out.println(jd.englishDate());
-		System.err.println(jd.format("%a %b %c %d %e %f %g %h %i %j %k %l %m %n"));
 	}
 
 // Object Methods ==================================================================================
 
-	public JewishDate() {
-		this(java.util.Calendar.getInstance());
-	}
-
-	// why do I need this ???
-	public JewishDate(boolean b) {
-		month = 0;
-		day = 0;
-		year = 0;
-
-		englishMonth = 0;
-		englishDay = 0;
-		englishYear = 0;
-
-		absoluteDay = JewishDate.GregorianToAbsolute(englishMonth, englishDay, englishYear);
-	}
+	public JewishDate() { this(java.util.Calendar.getInstance()); }
 
 	// Specifying the exact date
 	public JewishDate(int m, int d, int y) {
-		month = m;
-		day = d;
-		year = y;
+		this.month = m;
+		this.day = d;
+		this.year = y;
 
 		getEnglish();
-		absoluteDay = JewishDate.GregorianToAbsolute(englishMonth, englishDay, englishYear);
+		this.absoluteDay = JewishDate.GregorianToAbsolute(englishMonth, englishDay, englishYear);
 	}
 
 	// based on the absolute day
 	public JewishDate(int absolute) {
-		absoluteDay = absolute;
+		this.absoluteDay = absolute;
 
 		int[] mdy = JewishDate.AbsoluteToHebrew(absolute);
-		month = mdy[0];
-		day = mdy[1];
-		year = mdy[2];
+		this.month = mdy[0];
+		this.day = mdy[1];
+		this.year = mdy[2];
         getEnglish();
 	}
 
@@ -106,9 +79,16 @@ public class JewishDate {
 		englishDay = conversion[1];
 		englishYear = conversion[2];
 	}
-	public JewishDate add(int x) { return new JewishDate(absoluteDay + x); }
-	public JewishDate subtract(int x) { return new JewishDate(absoluteDay - x); }
 
+	// Date Math
+	public JewishDate add(int x) {
+		return new JewishDate(absoluteDay + x);
+	}
+	public JewishDate subtract(int x) {
+		return new JewishDate(absoluteDay - x);
+	}
+
+	// Jump to a specific day
 	public JewishDate next(int x) {
 		JewishDate JD = new JewishDate(this);
 		while(JD.dayOfWeek() != x) { JD = JD.add(1); }
@@ -130,59 +110,18 @@ public class JewishDate {
 		return (b-a)/7+1;
 	}
 
-// accessor methods  ========================================================================================
-
-	public int year() { return year; }
-	public int month() { return month; }
-	public int day() { return day; }
-	public int absolute() { return absoluteDay; }
-
 // String output ========================================================================================
 
-	public String format(String fmt) {
-		fmt = fmt.replaceAll("%a", Integer.toString(year));
-		fmt = fmt.replaceAll("%b", Gematria.getLetters(year, false));
-		fmt = fmt.replaceAll("%c", Integer.toString(month));
-		fmt = fmt.replaceAll("%d", englishChodeshNames[month - 1]);
-		fmt = fmt.replaceAll("%e", hebrewChodeshNames[month - 1]);
-		fmt = fmt.replaceAll("%f", Integer.toString(day));
-		fmt = fmt.replaceAll("%g", Gematria.getLetters(day));
-		fmt = fmt.replaceAll("%h", hebrewWeekdayNames[dayOfWeek()]);
-		fmt = fmt.replaceAll("%i", englishWeekdayNames[dayOfWeek()]);
-		fmt = fmt.replaceAll("%j", Integer.toString(dayOfWeek()));
-		fmt = fmt.replaceAll("%k", Integer.toString(englishYear));
-		fmt = fmt.replaceAll("%l", Integer.toString(englishMonth));
-		fmt = fmt.replaceAll("%m", englishMonthNames[englishMonth - 1]);
-		fmt = fmt.replaceAll("%n", Integer.toString(englishDay));
-		return fmt;
-	}
-
 	public String toString() {
-        String locationName = "Brooklyn, NY";
-        double latitude = 40.604162;
-        double longitude = -73.951044;
-        double elevation = 0; //optional elevation
-        TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
-        GeoLocation location = new GeoLocation(locationName, latitude, longitude, elevation, timeZone);
-        ComplexZmanimCalendar czc = new ComplexZmanimCalendar(location);
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(jewishDate() + " / ");
-		sb.append(englishDate());
-		return sb.toString();
+		int[] h = {year, month, day};
+		int[] e = {englishYear, englishMonth, englishDay};
+		return "{JEWISH: "+Arrays.toString(h)+", ENGLISH: "+Arrays.toString(e)+"}";
 	}
-
-	public String jewishDate() {
-		// return hebrewWeekdayNames[dayOfWeek()] +", "+ hebrewChodeshNames[month - 1] +" "+ day + ", "+ year;
-		return englishWeekdayNames[dayOfWeek()] +", "+ englishChodeshNames[month - 1] +" "+ day + ", "+ year;
-	}
-
-	public String englishDate() {
-		return englishWeekdayNames[dayOfWeek()] +", "+ englishMonthNames[englishMonth - 1] +" "+ englishDay +", "+ englishYear;
-	}
-
 
 // Conversion routines (static) ============================================================================
+
+	private static int HebrewEpoch = -1373429;
+	private static int[] monthLengths = {0,31,28,31,30,31,30,31,31,30,31,30,31};
 
 	public static int[] GregorianToHebrew(int month, int day, int year) {
 		return AbsoluteToHebrew(GregorianToAbsolute(month,day,year));

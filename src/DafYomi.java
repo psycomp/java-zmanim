@@ -55,7 +55,7 @@ public class DafYomi {
 	public static String getDaf(JewishDate jd) { return getDaf(jd, ENGLISH); }
 
 	public static String getDaf(JewishDate jd, int language) {
-		int absoluteDate = jd.absolute();
+		int absoluteDate = jd.absoluteDay;
 		int dafStart = JewishDate.GregorianToAbsolute(9, 11, 1923);
 		int dafChange = JewishDate.GregorianToAbsolute(6, 24, 1975);
 

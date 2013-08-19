@@ -10,7 +10,8 @@ public class Parshiyos {
 		Parshiyos p = new Parshiyos();
 		if(!p.parshaThisWeek()) System.out.println("No parsha is read this week.");
 		System.err.println("The next parsha we read is: " + p.nextParsha());
-		System.err.println("We read it on: " + (p.nextParshaDate()).format("%i %d %f (%k/%l/%n)"));
+		// System.err.println("We read it on: " + (p.nextParshaDate()).format("%i %d %f (%k/%l/%n)"));
+		System.err.println("We read it on: " + p.nextParshaDate());
 
 /*
 		// DEBUG
@@ -33,7 +34,7 @@ public class Parshiyos {
 	public Parshiyos() { this(new JewishDate(), ENGLISH); }
 
 	public Parshiyos(JewishDate jd, int language) {
-		int year = jd.year();
+		int year = jd.year;
 		String[] a = calculateParshiyos(year, language);
 
 		int p = 0;
@@ -46,21 +47,21 @@ public class Parshiyos {
 			JewishDate jd2 = new JewishDate(b);
 			if(jd2.dayOfWeek() == 7)  {
 
-				switch (jd2.month()) {
+				switch (jd2.month) {
 					case JewishDate.TISHREI:
-						switch (jd2.day()) {
+						switch (jd2.day) {
 							case 1: case 2: case 10: case 15: case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23: break;
 							default: h.put(new Integer(jd2.weekOfYear()), a[p++]); break;
 						}
 					break;
 					case JewishDate.NISSAN:
-						switch (jd2.day()) {
+						switch (jd2.day) {
 							case 15: case 16: case 17: case 18: case 19: case 20: case 21: case 22: break;
 							default: h.put(new Integer(jd2.weekOfYear()), a[p++]); break;
 						}
 					break;
 					case JewishDate.SIVAN:
-						switch (jd2.day()) {
+						switch (jd2.day) {
 							case 6: case 7: break;
 							default: h.put(new Integer(jd2.weekOfYear()), a[p++]); break;
 						}
