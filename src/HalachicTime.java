@@ -1,12 +1,17 @@
+import java.util.Date;
 import java.util.Calendar;
+import java.util.TimeZone;
 import net.sourceforge.zmanim.*;
 import net.sourceforge.zmanim.util.*;
-import java.util.TimeZone;
 
 public class HalachicTime {
 
 	int days, hours, chalokim;
 	boolean autoReduce = false;
+
+	public static void main(String[] args) {
+		System.out.println(HalachicTime.now());
+	}
 
 // Public Contructors
 
@@ -14,14 +19,6 @@ public class HalachicTime {
 		days = 0;
 		hours = 0;
 		chalokim = 0;
-
-        String locationName = "Brooklyn, NY";
-        double latitude = 40.604162;
-        double longitude = -73.951044;
-        double elevation = 0; //optional elevation
-        TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
-        GeoLocation location = new GeoLocation(locationName, latitude, longitude, elevation, timeZone);
-        ComplexZmanimCalendar czc = new ComplexZmanimCalendar(location);
 	}
 
 	public HalachicTime(int a, int b, int c, boolean ar) {
@@ -44,6 +41,7 @@ public class HalachicTime {
 
 // Setters
 
+	// Set by chalokim
 	public HalachicTime set(int c) {
         days = 0;
         hours = 0;
@@ -52,6 +50,7 @@ public class HalachicTime {
 		return this;
     }
 
+	// Set by day, hour, chalokim
 	public HalachicTime set(int a, int b, int c) {
         days = a;
         hours = b;
@@ -60,6 +59,7 @@ public class HalachicTime {
 		return this;
     }
 
+	// Clone another HalachicTime
 	public HalachicTime set(HalachicTime h) {
         days = h.days;
         hours = h.hours;
@@ -67,6 +67,8 @@ public class HalachicTime {
         balance();
 		return this;
     }
+
+// Utility functions
 
 	public boolean autoReduce(boolean b) {
 		if(b==true) {
@@ -77,10 +79,7 @@ public class HalachicTime {
 		}
 	}
 
-// Utility functions
-
-	public HalachicTime reduce() { return chalokimOnly(); }
-
+	// Modifies the object
 	public HalachicTime chalokimOnly() {
 		chalokim = inChalokim();
 		days = 0;
@@ -88,28 +87,29 @@ public class HalachicTime {
 		return this;
 	}
 
+	// Return a number, but don't modify the object
 	public int inChalokim() { return chalokim + (hours * 1080) + (days * 25920); }
 
-	public HalachicTime normalize() { return balance(); }
-
+	// AKA Distribute Time Properly
 	public HalachicTime balance() {
 		chalokimOnly();
 		days = chalokim / 25920;
-		if(autoReduce) round();
+		if(autoReduce)
+			round();
 		chalokim %= 25920;
 		hours = chalokim / 1080;
 		chalokim %= 1080;
 		return this;
 	}
 
-	public HalachicTime round() { return dropWeeks(); }
-
-	public HalachicTime dropWeeks() {
+	// AKA Drop Full Weeks
+	public HalachicTime round() {
 		days %= 7;
 		return this;
 	}
 
 // Object math
+// ALL modify the object
 
 	public HalachicTime add(HalachicTime m) {
 		addChalokim(m.inChalokim());
@@ -165,9 +165,11 @@ public class HalachicTime {
 
 // Output methods
 
-	public String toString() { return days +" days/"+ hours +" hours/"+ chalokim + " chalokim"; }
+	public String toString() { return "{ " + days +" days/"+ hours +" hours/"+ chalokim + " chalokim }"; }
 
 // Static Methods
+
+	// Get a preconfigured HalachicTime
 
 	public static HalachicTime getInstance(int x) {
 		switch(x) {
@@ -193,6 +195,18 @@ public class HalachicTime {
 		}
 	}
 
+	public Calendar getCalendar() {
+		Calendar c = Calendar.getInstance();
+		c.clear();
+		c.set(Calendar.HOUR, hours);
+		c.set(Calendar.MINUTE, chalokim / 18);
+		c.set(Calendar.SECOND, (int)((chalokim % 18) / 3.5));
+		c.set(Calendar.YEAR, 1900); // Equivalent to year-zero in a Date object
+		c.set(Calendar.MONTH, 0);
+		c.set(Calendar.DAY_OF_MONTH, 0);
+		return c;
+	}
+
 	public static HalachicTime now() {
 		HalachicTime m = new HalachicTime();
 		Calendar rightNow = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
@@ -204,10 +218,6 @@ public class HalachicTime {
 		chalokim = ((rightNow.get(Calendar.MINUTE) * 60.0) + rightNow.get(Calendar.SECOND)) * 0.3;
 		m.set(days, hours, (int)chalokim);
 		return m;
-	}
-
-	public static void main(String[] args) {
-		System.out.println(HalachicTime.now());
 	}
 
 // Constants

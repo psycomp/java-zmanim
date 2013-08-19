@@ -16,24 +16,28 @@ public class JewishDate {
 
 	public int absoluteDay;
 
+	private int hour = -1;
+	private int minute = -1;
+	public int second = -1;
+
 // Test program ====================================================================================
 
 	public static void main(String[] args) {
-		JewishDate jd = new JewishDate();
-		System.out.println(jd);
+		System.out.println(new JewishDate());
 	}
 
 // Object Methods ==================================================================================
 
+	// Initialize with current date
 	public JewishDate() { this(java.util.Calendar.getInstance()); }
 
-	// Specifying the exact date
+	// Specifying the exact jewish date
 	public JewishDate(int m, int d, int y) {
 		this.month = m;
 		this.day = d;
 		this.year = y;
 
-		getEnglish();
+		convert();
 		this.absoluteDay = JewishDate.GregorianToAbsolute(englishMonth, englishDay, englishYear);
 	}
 
@@ -45,7 +49,7 @@ public class JewishDate {
 		this.month = mdy[0];
 		this.day = mdy[1];
 		this.year = mdy[2];
-        getEnglish();
+        convert();
 	}
 
 	// clone of another day
@@ -73,14 +77,17 @@ public class JewishDate {
 		return jd;
 	}
 
-	public void getEnglish() {
+	// Assign english values fgrom jewish
+	private void convert() {
 		int[] conversion = HebrewToGregorian(month, day, year);
 		englishMonth = conversion[0];
 		englishDay = conversion[1];
 		englishYear = conversion[2];
 	}
 
-	// Date Math
+// Date Math ========================================================================================
+// SHOULD THEY MODIFY THE OBJECT OR NOT???
+
 	public JewishDate add(int x) {
 		return new JewishDate(absoluteDay + x);
 	}
@@ -89,6 +96,8 @@ public class JewishDate {
 	}
 
 	// Jump to a specific day
+	// e.g. jd = jd.next(JewishDate.SHABBOS)
+	//      jd = jd.previous(JewishDate.SUNDAY)
 	public JewishDate next(int x) {
 		JewishDate JD = new JewishDate(this);
 		while(JD.dayOfWeek() != x) { JD = JD.add(1); }
@@ -101,6 +110,8 @@ public class JewishDate {
 		return JD;
 	}
 
+	// Helper Methods
+
 	public int dayOfWeek() { return this.absoluteDay%7+1; }
 
 	public int weekOfYear() {
@@ -110,6 +121,18 @@ public class JewishDate {
 		return (b-a)/7+1;
 	}
 
+
+    public Calendar getCalendar() {
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.YEAR, englishYear);
+        c.set(Calendar.MONTH, englishMonth);
+        c.set(Calendar.DAY_OF_MONTH, englishDay);
+        return c;
+    }
 // String output ========================================================================================
 
 	public String toString() {

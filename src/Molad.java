@@ -134,7 +134,7 @@ public class Molad extends HalachicTime {
 		c.clear();
 		c.set(Calendar.YEAR, closestDate.englishYear);
 		c.set(Calendar.MONTH, closestDate.englishMonth - 1);
-		c.set(Calendar.DATE, closestDate.englishDay);
+		c.set(Calendar.DAY_OF_MONTH, closestDate.englishDay);
 		c.set(Calendar.HOUR, hours);
 		c.set(Calendar.MINUTE, (int)(chalokim / 18));
 		return c;
